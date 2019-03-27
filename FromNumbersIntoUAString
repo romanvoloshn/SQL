@@ -1,5 +1,5 @@
---select * from SumStrThree5(1717171.17)
---select dbo.SumStrThree5(0)
+--Процедура переводит числовое значение в текст. Была нужна для вывода информации денежных сумм на документах
+--select dbo.SumStrThree5(1717171.17)
 Create function SumStrThree5 (@nTempValue1 decimal(19,2))
 RETURNS varchar(1024)
 as begin
