@@ -1,0 +1,274 @@
+--select * from SumStrThree5(1717171.17)
+--select dbo.SumStrThree5(0)
+Create function SumStrThree5 (@nTempValue1 decimal(19,2))
+RETURNS varchar(1024)
+as begin
+
+declare @cFullString varchar(1024), @nTempValue int, @cSumma varchar(4000), @nRest int, @nRest1 int, @nRestFl int, @cEndWord varchar(100), @cS1 varchar(40), @cS10 varchar(40), 
+		@cS100 varchar(40), @cS1k varchar(40), @cThsnd varchar(15), @cS10k varchar(40), @cS100k varchar(40), 
+		@cS1mill varchar(40), @cMillion varchar(40), @cCurrency varchar(10), @cCoins varchar(40), 
+		@cSizeCoins varchar(40)
+if @nTempValue1 = 0
+ begin
+  set @cFullString = 'Нуль гривень 0 копійок'
+  
+  end
+else
+ begin
+  set @nTempValue = cast(@nTempValue1 as int) 		 
+--копейки
+  set @nRestFL = cast(((@nTempValue1 / 0.01) % 100) as int)
+
+ set @cSizeCoins = CONVERT(varchar(2), @nRestFl)
+
+  select @cCoins =
+  case @nRestFL % 10 
+   when 1 then 
+    case @nRestFL / 10
+     when 1 then ' копійок'
+     else ' копійка'
+    end
+   when 2 then 
+    case @nRestFL / 10
+      when 1 then ' копійок'
+      else ' копійки' 
+    end
+   when 3 then 
+    case @nRestFL / 10
+      when 1 then ' копійок'
+      else ' копійки'
+ 	 end
+   when 4 then 
+    case @nRestFL / 10
+     when 1 then ' копійок'
+     else  ' копійки'
+	 end
+   else ' копійок'
+  end
+--миллионы
+ set @nRest =  @nTempValue / 1000000 
+   Select @cS1mill =
+    Case @nRest   
+     when 0 then ''  
+     when 1 then 'один '    
+     when 2 then 'два '  
+     when 3 then 'три '  
+     when 4 then 'чотири '  
+     when 5 then 'п'+char(39)+'ять '  
+     when 6 then 'шість '  
+     when 7 then 'сім '  
+     when 8 then 'вісім '  
+     when 9 then 'дев'+ char(39) + 'ять '  
+    End;  		
+ 
+ set @cMillion = 
+  case @nRest
+   when 1 then 'мільйон '
+   when 2 then 'мільйони '		
+   when 3 then 'мільйони '
+   when 4 then 'мільйони '
+   else 'мільйонів '	
+  end	 
+ --сотни тысяч
+ set @nTempValue = @nTempValue - (@nTempValue / 1000000 * 1000000)
+ set @nRest =  @nTempValue / 100000 
+ 
+ Select @cS100k = 
+  Case @nRest
+   when 0 then ''  
+   when 1 then 'сто '  
+   when 2 then 'двісті '  
+   when 3 then 'триста '  
+   when 4 then 'чотириста '  
+   when 5 then 'п'+Char(39)+'ятсот '  
+   when 6 then 'шістсот '  
+   when 7 then 'сімсот '  
+   when 8 then 'вісімсот '  
+   when 9 then 'дев'+char(39) +'ятсот '  
+  End   
+
+--десятки тысяч
+ set @nTempValue = @nTempValue - (@nTempValue / 100000 * 100000)
+ set @nRest1 = @nTempValue / 1000
+ set @nRest =  @nTempValue / 10000
+ 
+ select @cS10k = 
+  case @nRest
+   when 0 then ''  
+   when 1 then   
+    Case @nRest1  
+     when 10 then 'десять '  
+     when 11 then 'одинадцять '  
+     when 12 then 'дванадцять '  
+     when 13 then 'тринадцять '  
+     when 14 then 'чотирнадцять '  
+     when 15 then 'п' + char(39) + 'ятнадцять '  
+     when 16 then 'шістнадцять '  
+     when 17 then 'сімнадцять '  
+     when 18 then 'вісімнадцять '  
+     when 19 then 'дев' + char(39) + 'ятнадцять '  
+    End   
+   when 2 then 'двадцять '  
+   when 3 then 'тридцять '  
+   when 4 then 'сорок '  
+   when 5 then 'п' + char(39) + 'ятдесят '  
+   when 6 then 'шістдесят '  
+   when 7 then 'сімдесят '  
+   when 8 then 'вісімдесят '  
+   when 9 then 'дев'+char(39)+'яносто ' 
+  end
+
+-- тысячи
+ set @nRest = @nTempValue - (@nTempValue / 10000 * 10000)
+ set @cS1k = ''  
+ 
+ If @nRest1 / 10 <> 1 
+  begin
+   select @cS1k = 
+    case @nRest / 1000
+    when 0 then ''
+    when 1 then 'одна '
+    when 2 then 'дві  '
+    when 3 then 'три '
+    when 4 then 'чотири '
+    when 5 then 'п' + char(39) + 'ять '
+    when 6 then 'шість '
+    when 7 then 'сім '
+    when 8 then 'вісім '
+    when 9 then 'дев' + char(39) + 'ять '
+    end
+  end
+
+ select @cThsnd =
+  case @nRest / 1000  
+   when 1 then 
+    case @nRest1 / 10
+     when 1 then 'тисяч '
+     else 'тисяча '
+    end
+   when 2 then case @nRest1 / 10
+     when 1 then 'тисяч '
+     else 'тисячі '
+    end
+   when 3 then case @nRest1 / 10
+     when 1 then 'тисяч '
+     else 'тисячі '
+    end
+   when 4  then case @nRest1 / 10
+     when 1 then 'тисяч '
+     else 'тисячі '
+    end
+   else 'тисяч '
+  end
+
+--сотни
+ set @nTempValue = @nTempValue - (@nTempValue / 1000 * 1000)
+ set @nRest = @nTempValue % 1000  
+
+ Select @cS100 = 
+  Case @nRest / 100  
+   when 0 then ''  
+   when 1 then 'сто '  
+   when 2 then 'двісті '  
+   when 3 then 'триста '  
+   when 4 then 'чотириста '  
+   when 5 then 'п'+Char(39)+'ятсот '  
+   when 6 then 'шістсот '  
+   when 7 then 'сімсот '  
+   when 8 then 'вісімсот '  
+   when 9 then 'дев'+char(39) +'ятсот '  
+  End   
+
+--десятки
+ set @nTempValue = @nTempValue - (@nTempValue / 100 * 100)
+ set @nRest = @nTempValue  
+ set @nRest1 = @nRest / 10  --десятки
+ set @cS1 = ''  
+ Select @cS10 = 
+  Case @nRest1  
+   when 0 then ''  
+   when 1 then   
+    Case @nRest  
+     when 10 then 'десять '  
+     when 11 then 'одинадцять '  
+     when 12 then 'дванадцять '  
+     when 13 then 'тринадцять '  
+     when 14 then 'чотирнадцять '  
+     when 15 then 'п' + char(39) + 'ятнадцять '  
+     when 16 then 'шістнадцять '  
+     when 17 then 'сімнадцять '  
+     when 18 then 'вісімнадцять '  
+     when 19 then 'дев' + char(39) + 'ятнадцять '  
+    End   
+   when 2 then 'двадцять '  
+   when 3 then 'тридцять '  
+   when 4 then 'сорок '  
+   when 5 then 'п' + char(39) + 'ятдесят '  
+   when 6 then 'шістдесят '  
+   when 7 then 'сімдесят '  
+   when 8 then 'вісімдесят '  
+   when 9 then 'дев'+char(39)+'яносто '  
+  End
+
+--единицы
+ If @nRest1 <> 1 
+  begin   
+   Select @cS1 =
+    Case @nRest % 10  
+     when 0 then ''  
+     when 1 then 'одна '    
+     when 2 then 'дві '  
+     when 3 then 'три '  
+     when 4 then 'чотири '  
+     when 5 then 'п'+char(39)+'ять '  
+     when 6 then 'шість '  
+     when 7 then 'сім '  
+     when 8 then 'вісім '  
+     when 9 then 'дев'+ char(39) + 'ять '  
+   End;  
+  END;
+
+ -- единицы измерения
+
+ select @cCurrency =
+  case @nTempValue % 10 
+   when 1 then 
+    case @nTempValue / 10
+     when 1 then 'гривень '
+     else 'гривня '
+    end
+   when 2 then 
+    case @nTempValue / 10
+      when 1 then 'гривень '
+      else 'гривні ' 
+	  end
+   when 3 then 
+    case @nTempValue / 10
+      when 1 then 'гривень '
+      else 'гривні '
+ 	end
+   when 4 then 
+    case @nTempValue / 10
+     when 1 then 'гривень '
+     else 'гривні ' 
+	 end
+   else 'гривень '
+  end
+
+
+ if @cS100k = '' and @cS10k = '' and @cS1k = ''
+  begin
+   set @cThsnd = ''
+  end
+ if @cS1mill = ''
+  begin
+   set @cMillion = ''
+  end
+--сборка строки
+ set @cFullString = RTrim(@cS1mill + @cMillion +@cS100k + @cS10k + @cS1k + @cThsnd + @cS100 + @cS10 + @cS1 + @cCurrency + @cSizeCoins + @cCoins)
+
+
+End
+return @cFullString;
+end
+
